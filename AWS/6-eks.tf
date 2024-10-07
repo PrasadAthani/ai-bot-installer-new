@@ -1,4 +1,4 @@
-resource "aws_iam_role" "var.name" {
+resource "aws_iam_role" "[var.name]" {
   name = "var.name"
 
   assume_role_policy = <<POLICY
@@ -19,11 +19,11 @@ POLICY
 
 resource "aws_iam_role_policy_attachment" "sbai_amazon_eks_cluster_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role       = aws_iam_role.sbai.name
+  role       = aws_iam_role.${name}.name
 }
 
 resource "aws_eks_cluster" "var.name" {
-  name     = "sbai"
+  name     = "var.name"
   role_arn = aws_iam_role.${name}.arn
   version  = "1.30"
 
