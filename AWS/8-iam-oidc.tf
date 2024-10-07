@@ -1,5 +1,5 @@
 data "tls_certificate" "eks" {
-  url = aws_eks_cluster.sbai.identity[0].oidc[0].issuer
+  url = aws_eks_cluster.${var.name}.identity[0].oidc[0].issuer
 }
 
 resource "aws_iam_openid_connect_provider" "eks" {
