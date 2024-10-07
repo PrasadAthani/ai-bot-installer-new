@@ -1,5 +1,5 @@
 resource "aws_iam_role" "nodes" {
-  name = "sbai-eks-node-group-nodes"
+  name = "var.name-eks-node-group-nodes"
 
   assume_role_policy = jsonencode({
     Statement = [{
@@ -29,7 +29,7 @@ resource "aws_iam_role_policy_attachment" "nodes_amazon_ec2_container_registry_r
 }
 
 resource "aws_eks_node_group" "private_nodes" {
-  cluster_name    = aws_eks_cluster.sbai.name
+  cluster_name    = aws_eks_cluster.${var.name}.name
   node_group_name = "private-nodes"
   node_role_arn   = aws_iam_role.nodes.arn
 
@@ -67,7 +67,7 @@ resource "aws_eks_node_group" "private_nodes" {
 }
 
 resource "aws_eks_node_group" "large_nodes" {
-  cluster_name    = aws_eks_cluster.sbai.name
+  cluster_name    = aws_eks_cluster.${var.name}.name
   node_group_name = "large-nodes"
   node_role_arn   = aws_iam_role.nodes.arn
 
