@@ -1,7 +1,7 @@
 # Static resource name instead of "var.name"
 resource "aws_iam_role" "eks_node_group_role" {
   # Use var.name in the attribute instead of resource name
-  name = "${var.name}-eks-node-group-nodes"
+  name = "var.name-eks-node-group-nodes"
 
   assume_role_policy = jsonencode({
     Statement = [{
