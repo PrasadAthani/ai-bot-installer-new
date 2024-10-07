@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "example_bucket" {
-  bucket = "sbai-assistant-bucket"
+  bucket = "${var.name}-assistant-bucket"
 
   force_destroy = true
 
