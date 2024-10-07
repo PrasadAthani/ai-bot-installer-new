@@ -1,7 +1,7 @@
 # Static resource name instead of "var.name"
 resource "aws_iam_role" "eks_cluster_role" {  
   # Use the var.name in the attribute instead of the resource name
-  name = "var.name-eks-cluster-role"
+  name = "${var.name}-eks-cluster-role"
 
   assume_role_policy = <<POLICY
 {
