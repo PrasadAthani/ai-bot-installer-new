@@ -1,5 +1,5 @@
 resource "aws_iam_role" "sbai" {
-  name = "sbai"
+  name = "var.name"
 
   assume_role_policy = <<POLICY
 {
@@ -23,7 +23,7 @@ resource "aws_iam_role_policy_attachment" "sbai_amazon_eks_cluster_policy" {
 }
 
 resource "aws_eks_cluster" "sbai" {
-  name     = "sbai"
+  name     = "var.name"
   role_arn = aws_iam_role.sbai.arn
   version  = "1.30"
 
