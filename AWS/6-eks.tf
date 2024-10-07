@@ -1,4 +1,4 @@
-resource "aws_iam_role" "${var.name}" {
+resource "aws_iam_role" "[var.name]" {
   name = "var.name"
 
   assume_role_policy = <<POLICY
