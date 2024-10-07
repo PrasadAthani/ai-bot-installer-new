@@ -1,5 +1,7 @@
-resource "aws_iam_role" "nodes" {
-  name = "var.name-eks-node-group-nodes"
+# Static resource name instead of "var.name"
+resource "aws_iam_role" "eks_node_group_role" {
+  # Use var.name in the attribute instead of resource name
+  name = "${var.name}-eks-node-group-nodes"
 
   assume_role_policy = jsonencode({
     Statement = [{
@@ -13,25 +15,26 @@ resource "aws_iam_role" "nodes" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "nodes_amazon_eks_worker_node_policy" {
+resource "aws_iam_role_policy_attachment" "eks_worker_node_policy_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = aws_iam_role.nodes.name
+  role       = aws_iam_role.eks_node_group_role.name
 }
 
-resource "aws_iam_role_policy_attachment" "nodes_amazon_eks_cni_policy" {
+resource "aws_iam_role_policy_attachment" "eks_cni_policy_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = aws_iam_role.nodes.name
+  role       = aws_iam_role.eks_node_group_role.name
 }
 
-resource "aws_iam_role_policy_attachment" "nodes_amazon_ec2_container_registry_read_only" {
+resource "aws_iam_role_policy_attachment" "ec2_container_registry_read_only_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = aws_iam_role.nodes.name
+  role       = aws_iam_role.eks_node_group_role.name
 }
 
+# Static resource name and corrected variable interpolation for cluster_name
 resource "aws_eks_node_group" "private_nodes" {
-  cluster_name    = aws_eks_cluster.[var.name].name
+  cluster_name    = aws_eks_cluster.eks_cluster.name  # Correct var.name usage
   node_group_name = "private-nodes"
-  node_role_arn   = aws_iam_role.nodes.arn
+  node_role_arn   = aws_iam_role.eks_node_group_role.arn
 
   subnet_ids = [
     aws_subnet.private_ap_south_1a.id,
@@ -51,7 +54,7 @@ resource "aws_eks_node_group" "private_nodes" {
     max_unavailable = 1
   }
 
-   tags = {
+  tags = {
     Name = "sbrc-ai-services"
   }
 
@@ -60,16 +63,17 @@ resource "aws_eks_node_group" "private_nodes" {
   }
 
   depends_on = [
-    aws_iam_role_policy_attachment.nodes_amazon_eks_worker_node_policy,
-    aws_iam_role_policy_attachment.nodes_amazon_eks_cni_policy,
-    aws_iam_role_policy_attachment.nodes_amazon_ec2_container_registry_read_only,
+    aws_iam_role_policy_attachment.eks_worker_node_policy_attachment,
+    aws_iam_role_policy_attachment.eks_cni_policy_attachment,
+    aws_iam_role_policy_attachment.ec2_container_registry_read_only_attachment,
   ]
 }
 
+# Static resource name and corrected variable interpolation for cluster_name
 resource "aws_eks_node_group" "large_nodes" {
-  cluster_name    = aws_eks_cluster.[var.name].name
+  cluster_name    = aws_eks_cluster.eks_cluster.name  # Correct var.name usage
   node_group_name = "large-nodes"
-  node_role_arn   = aws_iam_role.nodes.arn
+  node_role_arn   = aws_iam_role.eks_node_group_role.arn
 
   subnet_ids = [
     aws_subnet.private_ap_south_1a.id,
@@ -93,13 +97,13 @@ resource "aws_eks_node_group" "large_nodes" {
     Name = "marqo-db"
   }
 
-   labels = {
+  labels = {
     role = "marco"  
   }
 
   depends_on = [
-    aws_iam_role_policy_attachment.nodes_amazon_eks_worker_node_policy,
-    aws_iam_role_policy_attachment.nodes_amazon_eks_cni_policy,
-    aws_iam_role_policy_attachment.nodes_amazon_ec2_container_registry_read_only,
+    aws_iam_role_policy_attachment.eks_worker_node_policy_attachment,
+    aws_iam_role_policy_attachment.eks_cni_policy_attachment,
+    aws_iam_role_policy_attachment.ec2_container_registry_read_only_attachment,
   ]
 }
