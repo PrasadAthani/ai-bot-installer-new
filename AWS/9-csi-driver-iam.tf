@@ -1,24 +1,30 @@
+# Declare the variable directly in this file
+variable "name" {
+  description = "Base name for resources"
+  type        = string
+}
+
 data "aws_iam_policy_document" "csi" {
   statement {
     actions = ["sts:AssumeRoleWithWebIdentity"]
     effect  = "Allow"
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.eks.arn]
+    }
 
     condition {
       test     = "StringEquals"
       variable = "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub"
       values   = ["system:serviceaccount:kube-system:ebs-csi-controller-sa"]
     }
-
-    principals {
-      identifiers = [aws_iam_openid_connect_provider.eks.arn]
-      type        = "Federated"
-    }
   }
 }
 
 resource "aws_iam_role" "eks_ebs_csi_driver" {
   assume_role_policy = data.aws_iam_policy_document.csi.json
-  name               = "var.name-eks-ebs-csi-driver"
+  name               = "${var.name}-eks-ebs-csi-driver"  # Correctly referencing the variable
 }
 
 resource "aws_iam_role_policy_attachment" "amazon_ebs_csi_driver" {
@@ -27,7 +33,7 @@ resource "aws_iam_role_policy_attachment" "amazon_ebs_csi_driver" {
 }
 
 # Optional: only if you use your own KMS key to encrypt EBS volumes
-# TODO: replace arn:aws:kms:us-east-1:424432388155:key/7a8ea545-e379-4ac5-8903-3f5ae22ea847 with your KMS key id arn!
+# Replace with your KMS key ARN if applicable
 # resource "aws_iam_policy" "eks_ebs_csi_driver_kms" {
 #   name = "KMS_Key_For_Encryption_On_EBS"
 
