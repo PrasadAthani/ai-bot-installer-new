@@ -1,5 +1,7 @@
-resource "aws_iam_role" "var.name" {
-  name = "var.name"
+# Static resource name instead of "var.name"
+resource "aws_iam_role" "eks_cluster_role" {  
+  # Use the var.name in the attribute instead of the resource name
+  name = "${var.name}-eks-cluster-role"
 
   assume_role_policy = <<POLICY
 {
@@ -17,14 +19,16 @@ resource "aws_iam_role" "var.name" {
 POLICY
 }
 
-resource "aws_iam_role_policy_attachment" "var.name_amazon_eks_cluster_policy" {
+# Static resource name instead of "var.name_amazon_eks_cluster_policy"
+resource "aws_iam_role_policy_attachment" "eks_cluster_policy_attachment" {  
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role       = aws_iam_role.var.name.name
+  role       = aws_iam_role.eks_cluster_role.name
 }
 
-resource "aws_eks_cluster" "var.name" {
-  name     = "var.name"
-  role_arn = aws_iam_role.var.name.arn
+# Static resource name instead of "var.name"
+resource "aws_eks_cluster" "eks_cluster" {
+  name     = "${var.name}-eks-cluster"   # Here you can use var.name in the attribute
+  role_arn = aws_iam_role.eks_cluster_role.arn
   version  = "1.30"
 
   vpc_config {
@@ -36,5 +40,6 @@ resource "aws_eks_cluster" "var.name" {
     ]
   }
 
-  depends_on = [aws_iam_role_policy_attachment.sbai_amazon_eks_cluster_policy]
+  # Use the corrected resource reference name for the IAM role policy attachment
+  depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy_attachment]
 }
